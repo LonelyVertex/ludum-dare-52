@@ -14,6 +14,6 @@ public class UIController : MonoBehaviour
 
     private void HandleHarvestorValueChanged(HarvestorController harvestor, int newValue)
     {
-        _harvestorValueText.text = $"Current value: {newValue}";
+        _harvestorValueText.text = newValue.ToString();
     }
 }
