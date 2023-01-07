@@ -9,6 +9,8 @@ public class DamageableObject : MonoBehaviour
     public List<GameObject> _meshesOfDecreasingHealth;
     private int _hitpoints;
     public Action<int> OnDamaged;
+    public float _hitBumpStr;
+    public Rigidbody _rigidbody;
     void Start()
     {
         _hitpoints = _startHitPoints;
@@ -35,13 +37,18 @@ public class DamageableObject : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if(Input.GetKeyDown(KeyCode.T)){
+
+            var hitPos = transform.position + Vector3.forward;
+            _rigidbody.AddForceAtPosition(Vector3.one * _hitBumpStr, hitPos, ForceMode.Impulse);
+        }
     }
 
-    public void Damage()
+    public void Damage(Transform hitBy)
     {
         _hitpoints--;
         UpdateMesh();
+        _rigidbody.AddForceAtPosition(Vector3.one * _hitBumpStr, hitBy.position, ForceMode.Impulse);
         OnDamaged?.Invoke(_hitpoints);
     }
 }

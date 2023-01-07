@@ -77,13 +77,16 @@ public class Ennemy : MonoBehaviour
         if((Time.time - _lastAttackTime) >= _attackInterval)
         {
             _lastAttackTime = Time.time;
-            _player.GetComponent<DamageableObject>().Damage();
             if (_useBullets)
             {
                 var bullet = Instantiate(_bullet, _bulletOrigin);
                 bullet.GetComponent<Rigidbody>().AddForce(-bullet.transform.forward * _bulletSpeed, ForceMode.Impulse);
                 bullet.transform.parent = null;
                 StartCoroutine(WaitAndDestroyBullet(bullet));
+            }
+            else
+            {
+                _player.GetComponent<DamageableObject>().Damage(transform);
             }
         }
     }
