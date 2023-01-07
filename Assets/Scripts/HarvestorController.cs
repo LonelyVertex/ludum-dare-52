@@ -21,6 +21,10 @@ public class HarvestorController : MonoBehaviour
     [SerializeField] Transform _silo;
     [SerializeField] float _siloUnloadDistance;
     [SerializeField] float _siloUnloadSpeed;
+    [SerializeField] AudioSource _audioSource;
+    [SerializeField] GameObject _grainPrefab;
+    [SerializeField] Transform _grainExhaust;
+    [SerializeField] Transform _siloTop;
 
     public event System.Action<HarvestorController, int> harvestorValueChanged;
     public event System.Action<int> unloadToSilo;
@@ -106,7 +110,21 @@ public class HarvestorController : MonoBehaviour
             var value = Mathf.Min(_currentlyStoredHarvestValue, Mathf.CeilToInt(_siloUnloadSpeed * Time.deltaTime));
             AddHarvest(-value);
             unloadToSilo?.Invoke(value);
+
+            SpawnUnloadingGrain();
+            
+            if (!_audioSource.isPlaying) _audioSource.Play();
         }
+        else
+        {
+            _audioSource.Stop();
+        }
+    }
+
+    void SpawnUnloadingGrain()
+    {
+        var go = Instantiate(_grainPrefab, _grainExhaust.position, Quaternion.identity);
+        go.GetComponent<Grain>().SetUp(_grainExhaust.forward, _siloTop.position);
     }
 
     bool IsInSiloRange()

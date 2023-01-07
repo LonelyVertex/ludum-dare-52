@@ -36,7 +36,7 @@ public class UIController : MonoBehaviour
     public void SetTime(float value)
     {
         value = Mathf.Round(value);
-        var mins = Mathf.RoundToInt(value / 60);
+        var mins = Mathf.FloorToInt(value / 60);
         var secs = value % 60;
         var fill = secs < 10 ? "0" : "";
         _time.text = $"{mins}:{fill}{secs}";

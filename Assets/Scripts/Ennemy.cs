@@ -17,6 +17,10 @@ public class Ennemy : MonoBehaviour
     public float _bulletSpeed;
     public Transform _bulletOrigin;
     public float _timeToDestroyBullets = 4f;
+    [Header("Audio Settings")] 
+    public AudioSource audioSource;
+    public AudioClip shootSound;
+    public AudioClip meleeSound;
 
     public enum AIState { Idle, ChaseAndAttack, GoBack }
     private Vector3 _startPos;
@@ -83,10 +87,22 @@ public class Ennemy : MonoBehaviour
                 bullet.GetComponent<Rigidbody>().AddForce(-bullet.transform.forward * _bulletSpeed, ForceMode.Impulse);
                 bullet.transform.parent = null;
                 StartCoroutine(WaitAndDestroyBullet(bullet));
+
+                if (shootSound)
+                {
+                    audioSource.clip = shootSound;
+                    audioSource.Play();
+                }
             }
             else
             {
                 _player.GetComponent<DamageableObject>().Damage(transform);
+
+                if (meleeSound)
+                {
+                    audioSource.clip = meleeSound;
+                    audioSource.Play();
+                }
             }
         }
     }

@@ -15,6 +15,13 @@ public class FlowManager : MonoBehaviour
     [Space] 
     public int timeLimit;
 
+    [Space] 
+    public AudioSource audioSource;
+    public AudioClip startNumberSound;
+    public AudioClip startGoSound;
+    public AudioClip victorySound;
+    public AudioClip gameOverSound;
+
     float _startTime;
     bool _gameRunning;
     
@@ -35,12 +42,16 @@ public class FlowManager : MonoBehaviour
     IEnumerator StartGame()
     {
         _uiController.SetStartCountdown("3");
+        PlaySound(startNumberSound);
         yield return new WaitForSeconds(1);
         _uiController.SetStartCountdown("2");
+        PlaySound(startNumberSound);
         yield return new WaitForSeconds(1);
         _uiController.SetStartCountdown("1");
+        PlaySound(startNumberSound);
         yield return new WaitForSeconds(1);
         _uiController.SetStartCountdown("GO!");
+        PlaySound(startGoSound);
         _harvestorController.enabled = true;
         _startTime = Time.time;
         _gameRunning = true;
@@ -51,12 +62,14 @@ public class FlowManager : MonoBehaviour
     private void GameOver()
     {
         EndGame();
+        PlaySound(gameOverSound);
         _uiController.ShowGameOverScreen();
     }
 
     void Victory()
     {
         EndGame();
+        PlaySound(victorySound);
         _uiController.ShowVictoryScreen(_harvestorsManager.SiloValue);
     }
 
@@ -83,5 +96,11 @@ public class FlowManager : MonoBehaviour
         {
             Victory();
         }
+    }
+
+    void PlaySound(AudioClip sound)
+    {
+        audioSource.clip = sound;
+        audioSource.Play();
     }
 }
