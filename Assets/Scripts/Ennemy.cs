@@ -25,6 +25,8 @@ public class Ennemy : MonoBehaviour
     [Header("Kopr does not know what he is doing")]
     [SerializeField]
     private FlowManager flowManager;
+    [SerializeField]
+    private EnemySpawnerManager enemySpawnerManager;
     
     public enum AIState { Idle, ChaseAndAttack, GoBack }
     private Vector3 _startPos;
@@ -115,8 +117,13 @@ public class Ennemy : MonoBehaviour
 
     public void Kill()
     {
-        Destroy(gameObject);
-        flowManager.AddTime(5);
+        gameObject.SetActive(false);
+    }
+
+    public void ResetEnemy()
+    {
+        transform.position = _startPos;
+        gameObject.SetActive(true);
     }
 
     IEnumerator WaitAndDestroyBullet(GameObject bullet)

@@ -42,16 +42,16 @@ public class FlowManager : MonoBehaviour
 
     IEnumerator StartGame()
     {
-        // _uiController.SetStartCountdown("3");
-        // PlaySound(startNumberSound);
-        // yield return new WaitForSeconds(1);
-        // _uiController.SetStartCountdown("2");
-        // PlaySound(startNumberSound);
-        // yield return new WaitForSeconds(1);
-        // _uiController.SetStartCountdown("1");
-        // PlaySound(startNumberSound);
-        // yield return new WaitForSeconds(1);
-        // _uiController.SetStartCountdown("GO!");
+        _uiController.SetStartCountdown("3");
+        PlaySound(startNumberSound);
+        yield return new WaitForSeconds(1);
+        _uiController.SetStartCountdown("2");
+        PlaySound(startNumberSound);
+        yield return new WaitForSeconds(1);
+        _uiController.SetStartCountdown("1");
+        PlaySound(startNumberSound);
+        yield return new WaitForSeconds(1);
+        _uiController.SetStartCountdown("GO!");
         PlaySound(startGoSound);
         _harvestorController.enabled = true;
         _startTime = Time.time;
