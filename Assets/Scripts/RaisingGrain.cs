@@ -7,7 +7,6 @@ public class RaisingGrain : MonoBehaviour
 {
     public Vector3 _endScale;
     public Vector3 _endPos;
-    public float _maxGrain;
     public HarvestorController _harvester;
     
     private Vector3 _startScale;
@@ -21,7 +20,7 @@ public class RaisingGrain : MonoBehaviour
 
     private void OnGrainValueChanged(HarvestorController arg1, int grainVal)
     {
-        float t = Mathf.InverseLerp(0, _maxGrain, grainVal);
+        float t = Mathf.InverseLerp(0, _harvester.MaxGrain, grainVal);
         transform.localScale = Vector3.Lerp(_startScale, _endScale, t);
         transform.localPosition = Vector3.Lerp(_startPos, _endPos, t);
     }

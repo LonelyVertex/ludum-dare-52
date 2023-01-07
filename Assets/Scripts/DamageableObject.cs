@@ -11,6 +11,9 @@ public class DamageableObject : MonoBehaviour
     public Action<int> OnDamaged;
     public float _hitBumpStr;
     public Rigidbody _rigidbody;
+
+    public int MaxHp => _startHitPoints;
+    
     void Start()
     {
         _hitpoints = _startHitPoints;
