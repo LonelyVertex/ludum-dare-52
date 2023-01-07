@@ -30,6 +30,8 @@ public class HarvestorController : MonoBehaviour
     public event System.Action<int> unloadToSilo;
     public event System.Action<bool> siloRangeChanged;
 
+    public bool IsFull => MaxGrain <= _currentlyStoredHarvestValue;
+
     private int _currentlyStoredHarvestValue;
 
     public int MaxGrain => _maxGrain;

@@ -47,9 +47,9 @@ public class DamageableObject : MonoBehaviour
         }
     }
 
-    public void Damage(Transform hitBy)
+    public void Damage(Transform hitBy, int dmg = 1)
     {
-        _hitpoints--;
+        _hitpoints -= dmg;
         UpdateMesh();
         _rigidbody.AddForceAtPosition(Vector3.one * _hitBumpStr, hitBy.position, ForceMode.Impulse);
         OnDamaged?.Invoke(_hitpoints);
