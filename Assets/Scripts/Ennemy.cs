@@ -22,6 +22,10 @@ public class Ennemy : MonoBehaviour
     public AudioClip shootSound;
     public AudioClip meleeSound;
 
+    [Header("Kopr does not know what he is doing")]
+    [SerializeField]
+    private FlowManager flowManager;
+    
     public enum AIState { Idle, ChaseAndAttack, GoBack }
     private Vector3 _startPos;
     private float _lastAttackTime;    
@@ -49,11 +53,11 @@ public class Ennemy : MonoBehaviour
                     _currentState = AIState.ChaseAndAttack;
                 break;
             case AIState.ChaseAndAttack:
-                if(IsInAttackRange(_player.position)){
+                if(_player != null && IsInAttackRange(_player.position)){
                     LookAt(_player.position);
                     Attack();
                 }
-                else if (IsInDetectionRange(_player.position))
+                else if (_player != null && IsInDetectionRange(_player.position))
                 {
                     MoveTo(_player.position);
                 }
@@ -63,8 +67,10 @@ public class Ennemy : MonoBehaviour
                 }
                 break;
             case AIState.GoBack:
-                if (IsInDetectionRange(_player.position))
+                if(_player != null && IsInDetectionRange(_player.position))
+                {
                     _currentState = AIState.ChaseAndAttack;
+                }
                 MoveTo(_startPos);
                 break;
         }
@@ -72,7 +78,7 @@ public class Ennemy : MonoBehaviour
 
     internal void PlayerDied()
     {
-        _currentState = AIState.Idle;
+        _currentState = AIState.GoBack;
         _player = null;
     }
 
@@ -105,6 +111,12 @@ public class Ennemy : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void Kill()
+    {
+        Destroy(gameObject);
+        flowManager.AddTime(5);
     }
 
     IEnumerator WaitAndDestroyBullet(GameObject bullet)

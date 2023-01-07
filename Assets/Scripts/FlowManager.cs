@@ -23,6 +23,7 @@ public class FlowManager : MonoBehaviour
     public AudioClip gameOverSound;
 
     float _startTime;
+    float _extraTime;
     bool _gameRunning;
     
     void Start()
@@ -41,16 +42,16 @@ public class FlowManager : MonoBehaviour
 
     IEnumerator StartGame()
     {
-        _uiController.SetStartCountdown("3");
-        PlaySound(startNumberSound);
-        yield return new WaitForSeconds(1);
-        _uiController.SetStartCountdown("2");
-        PlaySound(startNumberSound);
-        yield return new WaitForSeconds(1);
-        _uiController.SetStartCountdown("1");
-        PlaySound(startNumberSound);
-        yield return new WaitForSeconds(1);
-        _uiController.SetStartCountdown("GO!");
+        // _uiController.SetStartCountdown("3");
+        // PlaySound(startNumberSound);
+        // yield return new WaitForSeconds(1);
+        // _uiController.SetStartCountdown("2");
+        // PlaySound(startNumberSound);
+        // yield return new WaitForSeconds(1);
+        // _uiController.SetStartCountdown("1");
+        // PlaySound(startNumberSound);
+        // yield return new WaitForSeconds(1);
+        // _uiController.SetStartCountdown("GO!");
         PlaySound(startGoSound);
         _harvestorController.enabled = true;
         _startTime = Time.time;
@@ -89,7 +90,7 @@ public class FlowManager : MonoBehaviour
     {
         if (!_gameRunning) return;
         
-        var elapsed = Time.time - _startTime;
+        var elapsed = Time.time - _startTime - _extraTime;
         _uiController.SetTime(timeLimit - elapsed);
 
         if (elapsed >= timeLimit)
@@ -97,6 +98,11 @@ public class FlowManager : MonoBehaviour
             Victory();
         }
     }
+
+    public void AddTime(int seconds)
+    {
+        _extraTime += seconds;
+    } 
 
     void PlaySound(AudioClip sound)
     {
