@@ -17,11 +17,14 @@ public class UIController : MonoBehaviour
     [SerializeField] TextMeshProUGUI _victoryPoints;
     
     [Header("Hints")] [SerializeField] GameObject unloadHint;
+    [SerializeField] GameObject repairHint;
     [SerializeField] GameObject fullHint;
 
     bool _harvestorFull;
+    bool _harvestorDamaged;
     bool _harvestorNotEmpty;
     bool _inSiloRange;
+    bool _inRepairStationRange;
 
     public void SetStartCountdown(string value)
     {
@@ -64,6 +67,7 @@ public class UIController : MonoBehaviour
         HarvestorsManager.instance.harvestorHpChanged += HandleHarvestorHpChanged;
         HarvestorsManager.instance.siloValueChanged += HandleSiloValueChanged;
         HarvestorsManager.instance.siloRangeChanged += HandleSiloRangeChanged;
+        HarvestorsManager.instance.repairStationRangeChanged += HandleRepairStationRangeChanged;
 
         _harvestorValueText.text = "0";
         _cropsSlider.value = 0;
@@ -80,6 +84,7 @@ public class UIController : MonoBehaviour
 
     private void HandleHarvestorHpChanged(DamageableObject harvestor, int newValue)
     {
+        _harvestorDamaged = harvestor.DamageValue > 0;
         _hpSlider.value = (float)newValue / harvestor.MaxHp;
     }
 
@@ -94,9 +99,16 @@ public class UIController : MonoBehaviour
         UpdateHints();
     }
 
+    private void HandleRepairStationRangeChanged(bool newValue)
+    {
+        _inRepairStationRange = newValue;
+        UpdateHints();
+    }
+
     void UpdateHints()
     {
         unloadHint.SetActive(false);
+        repairHint.SetActive(false);
         fullHint.SetActive(false);
 
         if (_harvestorFull && !_inSiloRange)
@@ -106,6 +118,10 @@ public class UIController : MonoBehaviour
         else if (_inSiloRange && _harvestorNotEmpty)
         {
             unloadHint.SetActive(true);
+        }
+        else if (_inRepairStationRange && _harvestorDamaged)
+        {
+            repairHint.SetActive(true);
         }
     }
 }

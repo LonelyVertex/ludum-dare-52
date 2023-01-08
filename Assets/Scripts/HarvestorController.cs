@@ -25,10 +25,19 @@ public class HarvestorController : MonoBehaviour
     [SerializeField] GameObject _grainPrefab;
     [SerializeField] Transform _grainExhaust;
     [SerializeField] Transform _siloTop;
+    
+    [Header("Repairing")] 
+    [SerializeField] DamageableObject _damageableObject;
+    [SerializeField] Transform _repairStation;
+    [SerializeField] float _repairStationDistance;
+    [SerializeField] GameObject _repairStationParticleSystem;
+    [SerializeField] float _repairSpeed;
 
     public event System.Action<HarvestorController, int> harvestorValueChanged;
     public event System.Action<int> unloadToSilo;
     public event System.Action<bool> siloRangeChanged;
+    
+    public event System.Action<bool> repairStationRangeChanged;
 
     public bool IsFull => MaxGrain <= _currentlyStoredHarvestValue;
 
@@ -47,8 +56,10 @@ public class HarvestorController : MonoBehaviour
     void Update()
     {
         HandleUnload();
+        HandleRepair();
         
         siloRangeChanged?.Invoke(IsInSiloRange());
+        repairStationRangeChanged?.Invoke(IsInRepairStationRange());
     }
 
     public void AddHarvest(int value)
@@ -123,6 +134,22 @@ public class HarvestorController : MonoBehaviour
         }
     }
 
+    private void HandleRepair()
+    {
+        if (_inputModule.IsActionButtonDown() && IsInRepairStationRange() && _damageableObject.DamageValue > 0)
+        {
+            _repairStationParticleSystem.SetActive(true);
+            var value = _repairSpeed * Time.deltaTime;
+            _damageableObject.Repair(value);
+        }
+        else
+        {
+            _repairStationParticleSystem.SetActive(false);
+            _damageableObject.RestartRepairs();
+            _audioSource.Stop();
+        }
+    }
+
     void SpawnUnloadingGrain()
     {
         var go = Instantiate(_grainPrefab, _grainExhaust.position, Quaternion.identity);
@@ -132,5 +159,10 @@ public class HarvestorController : MonoBehaviour
     bool IsInSiloRange()
     {
         return Vector3.Distance(transform.position, _silo.position) < _siloUnloadDistance;
+    }
+
+    bool IsInRepairStationRange()
+    {
+        return Vector3.Distance(transform.position, _repairStation.position) < _repairStationDistance;
     }
 }

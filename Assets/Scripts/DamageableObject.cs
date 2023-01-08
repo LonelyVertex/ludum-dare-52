@@ -8,9 +8,12 @@ public class DamageableObject : MonoBehaviour
     public int _startHitPoints;
     public List<GameObject> _meshesOfDecreasingHealth;
     private int _hitpoints;
+    private float _partialHitpoints = 0;
     public Action<int> OnDamaged;
     public float _hitBumpStr;
     public Rigidbody _rigidbody;
+    
+    public int DamageValue => _startHitPoints - _hitpoints;
 
     public int MaxHp => _startHitPoints;
     
@@ -53,5 +56,23 @@ public class DamageableObject : MonoBehaviour
         UpdateMesh();
         _rigidbody.AddForceAtPosition(Vector3.one * _hitBumpStr, hitBy.position, ForceMode.Impulse);
         OnDamaged?.Invoke(_hitpoints);
+    }
+
+    public void Repair(float value)
+    {
+        _partialHitpoints += value;
+        if (_partialHitpoints >= 1.0f)
+        {
+            var addHitpoints = Mathf.FloorToInt(_partialHitpoints);
+            _partialHitpoints -= addHitpoints;
+            _hitpoints = Mathf.Min(MaxHp, _hitpoints + addHitpoints);
+            OnDamaged?.Invoke(_hitpoints);
+            UpdateMesh();
+        }
+    }
+
+    public void RestartRepairs()
+    {
+        _partialHitpoints = 0;
     }
 }

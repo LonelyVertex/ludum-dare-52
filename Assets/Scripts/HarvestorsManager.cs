@@ -8,6 +8,7 @@ public class HarvestorsManager : Singleton<HarvestorsManager>
     public event System.Action<DamageableObject, int> harvestorHpChanged;
     public event System.Action<int> siloValueChanged;
     public event System.Action<bool> siloRangeChanged;
+    public event System.Action<bool> repairStationRangeChanged;
 
     int siloValue = 0;
 
@@ -21,6 +22,7 @@ public class HarvestorsManager : Singleton<HarvestorsManager>
             harvestor.harvestorValueChanged += HandleHarvestorValueChanged;
             harvestor.unloadToSilo += HandleUnloadToSilo;
             harvestor.siloRangeChanged += HandleSiloRangedChanged;
+            harvestor.repairStationRangeChanged += HandleRepairStationRangedChanged;
 
             var damageableObject = harvestor.GetComponent<DamageableObject>();
             damageableObject.OnDamaged += newValue => HandleHarvestorHpChanged(damageableObject, newValue);
@@ -46,5 +48,10 @@ public class HarvestorsManager : Singleton<HarvestorsManager>
     void HandleSiloRangedChanged(bool value)
     {
         siloRangeChanged?.Invoke(value);
+    }
+
+    void HandleRepairStationRangedChanged(bool value)
+    {
+        repairStationRangeChanged?.Invoke(value);
     }
 }
