@@ -60,7 +60,6 @@ public class HarvestorController : MonoBehaviour
         HandleSteering();
         HandleFriction();
         HandleDrifting();
-        HandleNitro();
         LimitMaxSpeed();
     }
 
@@ -69,6 +68,7 @@ public class HarvestorController : MonoBehaviour
         HandleUnload();
         HandleRepair();
         HandleHarvest();
+        HandleNitro();
         
         siloRangeChanged?.Invoke(IsInSiloRange());
         repairStationRangeChanged?.Invoke(IsInRepairStationRange());

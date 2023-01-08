@@ -451,7 +451,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: "Made during Ludum Dare 52\nFilip Hauptfleisch, Jack Berreby, Jan Slifka,
-    Jakub Kop\u0159iva, Jakub Mirovsk\xFD"
+    Jakub Kopriva, Jakub Mirovsk\xFD"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7b07faf12d0ae40e3a97b56314b19a6d, type: 2}
   m_sharedMaterial: {fileID: -3442780640754074912, guid: 7b07faf12d0ae40e3a97b56314b19a6d,
