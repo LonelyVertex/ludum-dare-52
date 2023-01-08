@@ -13,6 +13,11 @@ public class HarvestorController : MonoBehaviour
     [SerializeField] float _tireDrag;
     [SerializeField] float _maxSpeed;
     [SerializeField] float _tireMarkLimit;
+    [SerializeField] float _driftForce;
+    
+    [Header("NITROOOOO")]
+    [SerializeField] float _nitroAccelerationMultiplier;
+    [SerializeField] float _nitroBurnRate;
 
     [SerializeField] List<TrailRenderer> _tireMarkTrailRenderers;
 
@@ -25,6 +30,7 @@ public class HarvestorController : MonoBehaviour
     [SerializeField] GameObject _grainPrefab;
     [SerializeField] Transform _grainExhaust;
     [SerializeField] Transform _siloTop;
+    [SerializeField] float _harvestingSpeed;
     
     [Header("Repairing")] 
     [SerializeField] DamageableObject _damageableObject;
@@ -42,15 +48,19 @@ public class HarvestorController : MonoBehaviour
 
     public bool IsFull => MaxGrain <= _currentlyStoredHarvestValue;
 
-    private int _currentlyStoredHarvestValue;
+    private float _currentlyStoredHarvestValue;
 
     public int MaxGrain => _maxGrain;
+
+    private float _harvestTime = 0.0f;
 
     protected void FixedUpdate()
     {
         HandleAcceleration();
         HandleSteering();
         HandleFriction();
+        HandleDrifting();
+        HandleNitro();
         LimitMaxSpeed();
     }
 
@@ -58,6 +68,7 @@ public class HarvestorController : MonoBehaviour
     {
         HandleUnload();
         HandleRepair();
+        HandleHarvest();
         
         siloRangeChanged?.Invoke(IsInSiloRange());
         repairStationRangeChanged?.Invoke(IsInRepairStationRange());
@@ -65,13 +76,27 @@ public class HarvestorController : MonoBehaviour
 
     public void AddHarvest(int value)
     {
+        if (value > 0 && _damageableObject.currentHarvestingParticleSystem != null)
+        {
+            _harvestTime = 1.0f;
+            if (!_damageableObject.currentHarvestingParticleSystem.isPlaying)
+            {
+                _damageableObject.currentHarvestingParticleSystem.Play();
+            }
+        }
+        
         _currentlyStoredHarvestValue = Mathf.Clamp(_currentlyStoredHarvestValue + value, 0, _maxGrain);
-        harvestorValueChanged?.Invoke(this, _currentlyStoredHarvestValue);
+        harvestorValueChanged?.Invoke(this, Mathf.CeilToInt(_currentlyStoredHarvestValue));
     }
 
     private void HandleAcceleration()
     {
-        float acceleration = _accelerationMultiplier * _inputModule.GetVerticalAxis();
+        var accelerationMultiplier =
+            _inputModule.IsNitroButtonDown() && _currentlyStoredHarvestValue > 0.0f ?
+                _nitroAccelerationMultiplier :
+                _accelerationMultiplier;
+        
+        float acceleration = accelerationMultiplier * _inputModule.GetVerticalAxis();
         var accelerationVector = acceleration * transform.forward;
         _rigidbody.AddForce(accelerationVector);
     }
@@ -87,6 +112,39 @@ public class HarvestorController : MonoBehaviour
             currentAngle -= Time.deltaTime * _steeringMultiplier * steeringInput;
             var newRotation = Quaternion.Euler(currentRotation.eulerAngles.x, currentAngle, currentRotation.z);
             _rigidbody.MoveRotation(newRotation);
+        }
+    }
+
+    private void HandleDrifting()
+    {
+        var steeringInput = _inputModule.GetHorizontalAxis();
+        if (_inputModule.GetDriftButtonDown() && Mathf.Abs(steeringInput) > 0.03f)
+        {
+            var force = steeringInput > 0 ? -Vector3.one : Vector3.one;
+            // _rigidbody.AddForceAtPosition(force * _driftForce, transform.position + Vector3.forward, ForceMode.Impulse);
+            _rigidbody.AddForceAtPosition(force * _driftForce, transform.position + Vector3.forward, ForceMode.Impulse);
+        }
+    }
+
+    private void HandleNitro()
+    {
+        if (
+            _currentlyStoredHarvestValue <= 0.0f && _damageableObject.currentNitroParticleSystem.isPlaying ||
+            _inputModule.GetNitroButtonUp() && _damageableObject.currentNitroParticleSystem != null)
+        {
+            _damageableObject.currentNitroParticleSystem.Stop();
+        }
+        
+        if (_inputModule.IsNitroButtonDown() && _currentlyStoredHarvestValue > 0.0f)
+        {
+            if (_damageableObject.currentNitroParticleSystem != null && !_damageableObject.currentNitroParticleSystem.isPlaying)
+            {
+                _damageableObject.currentNitroParticleSystem.Play();
+            }
+
+            _currentlyStoredHarvestValue = Mathf.Max(_currentlyStoredHarvestValue - _nitroBurnRate * Time.deltaTime, 0.0f);
+            
+            harvestorValueChanged?.Invoke(this, Mathf.CeilToInt(_currentlyStoredHarvestValue));
         }
     }
 
@@ -121,7 +179,10 @@ public class HarvestorController : MonoBehaviour
     {
         if (_inputModule.IsActionButtonDown() && IsInSiloRange() && _currentlyStoredHarvestValue > 0)
         {
-            var value = Mathf.Min(_currentlyStoredHarvestValue, Mathf.CeilToInt(_siloUnloadSpeed * Time.deltaTime));
+            var value = Mathf.CeilToInt(
+                Mathf.Min(_currentlyStoredHarvestValue,
+                Mathf.CeilToInt(_siloUnloadSpeed * Time.deltaTime))
+            );
             AddHarvest(-value);
             unloadToSilo?.Invoke(value);
 
@@ -150,6 +211,17 @@ public class HarvestorController : MonoBehaviour
             _repairStationParticleSystem.SetActive(false);
             _damageableObject.RestartRepairs();
         }
+    }
+
+    private void HandleHarvest()
+    {
+        if (_harvestTime <= 0.0f && _damageableObject.currentHarvestingParticleSystem != null && !_damageableObject.currentHarvestingParticleSystem.isStopped)
+        {
+            _damageableObject.currentHarvestingParticleSystem.Stop();
+            return;
+        }
+        
+        _harvestTime = Mathf.Clamp(_harvestTime - (Time.deltaTime * _harvestingSpeed), 0.0f, 1.0f);
     }
 
     void SpawnUnloadingGrain()

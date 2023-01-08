@@ -9,13 +9,16 @@ public class UIController : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI _harvestorValueText;
     [SerializeField] Slider _cropsSlider;
+    [SerializeField] Image _cropsSliderImage;
     [SerializeField] Slider _hpSlider;
+    [SerializeField] Image _hpSliderImage;
     [SerializeField] TextMeshProUGUI _startCountdown;
     [SerializeField] TextMeshProUGUI _time;
     [SerializeField] GameObject _gameOverScreen;
     [SerializeField] GameObject _victoryScreen;
     [SerializeField] TextMeshProUGUI _victoryPoints;
-    
+    [SerializeField] FlowManager _flowManager;
+
     [Header("Hints")] [SerializeField] GameObject unloadHint;
     [SerializeField] GameObject repairHint;
     [SerializeField] GameObject fullHint;
@@ -25,6 +28,8 @@ public class UIController : MonoBehaviour
     bool _harvestorNotEmpty;
     bool _inSiloRange;
     bool _inRepairStationRange;
+    
+    float _firstTimeValue = -1.0f;
 
     public void SetStartCountdown(string value)
     {
@@ -38,11 +43,18 @@ public class UIController : MonoBehaviour
     
     public void SetTime(float value)
     {
+        if (_firstTimeValue == -1.0f)
+        {
+            _firstTimeValue = value;
+        }
+        
         value = Mathf.Round(value);
         var mins = Mathf.FloorToInt(value / 60);
         var secs = value % 60;
         var fill = secs < 10 ? "0" : "";
         _time.text = $"{mins}:{fill}{secs}";
+
+        _time.color = Color.Lerp(Color.red, Color.white, value / _firstTimeValue);
     }
 
     public void ShowGameOverScreen()
@@ -58,7 +70,7 @@ public class UIController : MonoBehaviour
 
     public void Restart()
     {
-        SceneManager.LoadScene(0);
+        _flowManager.Restart();
     }
     
     protected void Start()
@@ -79,6 +91,7 @@ public class UIController : MonoBehaviour
         _cropsSlider.value = (float)newValue / harvestor.MaxGrain;
         _harvestorFull = harvestor.MaxGrain == newValue;
         _harvestorNotEmpty = newValue > 0;
+        _cropsSliderImage.color = Color.Lerp(Color.white, Color.red, (float) newValue / harvestor.MaxGrain);
         UpdateHints();
     }
 
@@ -86,6 +99,7 @@ public class UIController : MonoBehaviour
     {
         _harvestorDamaged = harvestor.DamageValue > 0;
         _hpSlider.value = (float)newValue / harvestor.MaxHp;
+        _hpSliderImage.color = Color.Lerp(Color.red, Color.white, (float) newValue / harvestor.MaxHp);
     }
 
     private void HandleSiloValueChanged(int newValue)

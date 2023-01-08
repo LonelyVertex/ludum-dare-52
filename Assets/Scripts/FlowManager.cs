@@ -7,6 +7,7 @@ using UnityEngine.UI;
 
 public class FlowManager : MonoBehaviour
 {
+    public FadeInController _fadeInController;
     public HarvestorController _harvestorController;
     public HarvestorsManager _harvestorsManager;
     public UIController _uiController;
@@ -42,6 +43,7 @@ public class FlowManager : MonoBehaviour
 
     IEnumerator StartGame()
     {
+        yield return _fadeInController.FadeIn();
         _uiController.SetStartCountdown("3");
         PlaySound(startNumberSound);
         yield return new WaitForSeconds(1);
@@ -60,6 +62,18 @@ public class FlowManager : MonoBehaviour
         _uiController.HideStartCountdown();
     }
 
+    public void Restart()
+    {
+        StartCoroutine(RestartCoroutine());
+    }
+
+    private IEnumerator RestartCoroutine()
+    {
+        yield return _fadeInController.FadeOut();
+        
+        SceneManager.LoadScene("HarvestScene");
+    }
+
     private void GameOver()
     {
         EndGame();
@@ -72,6 +86,9 @@ public class FlowManager : MonoBehaviour
         EndGame();
         PlaySound(victorySound);
         _uiController.ShowVictoryScreen(_harvestorsManager.SiloValue);
+        
+        PlayerPrefs.SetInt("score", _harvestorsManager.SiloValue);
+        PlayerPrefs.Save();
     }
 
     void EndGame()

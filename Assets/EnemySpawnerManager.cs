@@ -7,6 +7,7 @@ public class EnemySpawnerManager : MonoBehaviour
     [SerializeField] private GameObject bloodPrefab;
     [SerializeField] private FlowManager flowManager;
     [SerializeField] private AudioSource dieAudioSource;
+    
     public void KillEnemy(Ennemy enemy)
     {
         dieAudioSource.PlayOneShot(dieAudioSource.clip);

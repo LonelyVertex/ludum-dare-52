@@ -11,6 +11,8 @@ public class InputModule : MonoBehaviour
     [SerializeField] KeyCode _upKeyCodeAlt;
     [SerializeField] KeyCode _downKeyCode;
     [SerializeField] KeyCode _downKeyCodeAlt;
+    [SerializeField] KeyCode _drifButtonKeyCode;
+    [SerializeField] KeyCode _nitroButtonKeyCode;
 
     public float GetHorizontalAxis()
     {
@@ -47,5 +49,20 @@ public class InputModule : MonoBehaviour
     public bool IsActionButtonDown()
     {
         return Input.GetKey(_actionButtonKeyCode);
+    }
+
+    public bool GetDriftButtonDown()
+    {
+        return Input.GetKeyDown(_drifButtonKeyCode);
+    }
+    
+    public bool IsNitroButtonDown()
+    {
+        return Input.GetKey(_nitroButtonKeyCode);
+    }
+
+    public bool GetNitroButtonUp()
+    {
+        return Input.GetKeyUp(_nitroButtonKeyCode);
     }
 }

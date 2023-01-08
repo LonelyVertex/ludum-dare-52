@@ -13,13 +13,20 @@ public class DamageableObject : MonoBehaviour
     public float _hitBumpStr;
     public Rigidbody _rigidbody;
     public AudioSource _audioSource;
+    public List<ParticleSystem> _harvestingParticleSystems;
+    public CameraManager _cameraManager;
+    public List<ParticleSystem> _damagedNitroParticleSystems;
     
     public int DamageValue => _startHitPoints - _hitpoints;
-
     public int MaxHp => _startHitPoints;
+    public ParticleSystem currentHarvestingParticleSystem => _currentHarvestingParticleSystem;
+    public ParticleSystem currentNitroParticleSystem => _currentNitroParticleSystem;
+    
+    private ParticleSystem _currentHarvestingParticleSystem;
+    private ParticleSystem _currentNitroParticleSystem;
     
     void Start()
-    {
+    {   
         _hitpoints = _startHitPoints;
         UpdateMesh();
     }
@@ -39,16 +46,21 @@ public class DamageableObject : MonoBehaviour
             }
         }
         activeMesh.SetActive(true);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if(Input.GetKeyDown(KeyCode.T)){
-
-            var hitPos = transform.position + Vector3.forward;
-            _rigidbody.AddForceAtPosition(Vector3.one * _hitBumpStr, hitPos, ForceMode.Impulse);
+        
+        int activeParticleSystem = 0;
+        for (int i = _harvestingParticleSystems.Count - 1; i >= 0; i--)
+        {
+            if (_harvestingParticleSystems[i] != null)
+            {
+                _harvestingParticleSystems[i].Stop();
+                if (i >= _hitpoints)
+                {
+                    activeParticleSystem = i;
+                }
+            }
         }
+        _currentHarvestingParticleSystem = _harvestingParticleSystems[activeParticleSystem];
+        _currentNitroParticleSystem = _damagedNitroParticleSystems[activeParticleSystem];
     }
 
     public void Damage(Transform hitBy, int dmg = 1)
@@ -56,6 +68,7 @@ public class DamageableObject : MonoBehaviour
         _hitpoints -= dmg;
         UpdateMesh();
         _rigidbody.AddForceAtPosition(Vector3.one * _hitBumpStr, hitBy.position, ForceMode.Impulse);
+        _cameraManager.Shake();
         OnDamaged?.Invoke(_hitpoints);
     }
 
