@@ -66,12 +66,24 @@ public class FlowManager : MonoBehaviour
     {
         StartCoroutine(RestartCoroutine());
     }
+    
+    public void ToMenu()
+    {
+        StartCoroutine(ToMenuCoroutine());
+    }
 
     private IEnumerator RestartCoroutine()
     {
         yield return _fadeInController.FadeOut();
         
         SceneManager.LoadScene("HarvestScene");
+    }
+    
+    private IEnumerator ToMenuCoroutine()
+    {
+        yield return _fadeInController.FadeOut();
+        
+        SceneManager.LoadScene("MenuScene");
     }
 
     private void GameOver()
@@ -85,10 +97,15 @@ public class FlowManager : MonoBehaviour
     {
         EndGame();
         PlaySound(victorySound);
-        _uiController.ShowVictoryScreen(_harvestorsManager.SiloValue);
         
-        PlayerPrefs.SetInt("score", _harvestorsManager.SiloValue);
-        PlayerPrefs.Save();
+        var prevValue = PlayerPrefs.GetInt("score", -1);
+        _uiController.ShowVictoryScreen(_harvestorsManager.SiloValue, prevValue);
+
+        if (prevValue < _harvestorsManager.SiloValue)
+        {
+            PlayerPrefs.SetInt("score", _harvestorsManager.SiloValue);
+            PlayerPrefs.Save();
+        }
     }
 
     void EndGame()

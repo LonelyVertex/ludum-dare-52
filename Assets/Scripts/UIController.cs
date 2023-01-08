@@ -17,6 +17,7 @@ public class UIController : MonoBehaviour
     [SerializeField] GameObject _gameOverScreen;
     [SerializeField] GameObject _victoryScreen;
     [SerializeField] TextMeshProUGUI _victoryPoints;
+    [SerializeField] TextMeshProUGUI _previousVictoryPoints;
     [SerializeField] FlowManager _flowManager;
 
     [Header("Hints")] [SerializeField] GameObject unloadHint;
@@ -62,8 +63,10 @@ public class UIController : MonoBehaviour
         _gameOverScreen.SetActive(true);
     }
 
-    public void ShowVictoryScreen(int points)
+    public void ShowVictoryScreen(int points, int prevPoints)
     {
+        _previousVictoryPoints.gameObject.SetActive(prevPoints != -1);
+        _previousVictoryPoints.text = $"Previous best: {prevPoints}";
         _victoryPoints.text = $"{points}";
         _victoryScreen.SetActive(true);
     }
@@ -72,7 +75,12 @@ public class UIController : MonoBehaviour
     {
         _flowManager.Restart();
     }
-    
+
+    public void ToMenu()
+    {
+        _flowManager.ToMenu();
+    }
+
     protected void Start()
     {
         HarvestorsManager.instance.harvestorValueChanged += HandleHarvestorValueChanged;
