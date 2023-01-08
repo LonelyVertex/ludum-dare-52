@@ -32,6 +32,7 @@ public class HarvestorController : MonoBehaviour
     [SerializeField] float _repairStationDistance;
     [SerializeField] GameObject _repairStationParticleSystem;
     [SerializeField] float _repairSpeed;
+    [SerializeField] RepairShop _repairShop;
 
     public event System.Action<HarvestorController, int> harvestorValueChanged;
     public event System.Action<int> unloadToSilo;
@@ -118,15 +119,16 @@ public class HarvestorController : MonoBehaviour
 
     private void HandleUnload()
     {
-        if (_inputModule.IsActionButtonDown() && IsInSiloRange() && _currentlyStoredHarvestValue > 0)
+        if (_inputModule.IsActionButtonDown())
         {
             var value = Mathf.Min(_currentlyStoredHarvestValue, Mathf.CeilToInt(_siloUnloadSpeed * Time.deltaTime));
             AddHarvest(-value);
             unloadToSilo?.Invoke(value);
-
             SpawnUnloadingGrain();
-            
-            if (!_audioSource.isPlaying) _audioSource.Play();
+            if (!_audioSource.isPlaying)
+            {
+                _audioSource.Play();
+            }
         }
         else
         {
@@ -138,12 +140,14 @@ public class HarvestorController : MonoBehaviour
     {
         if (_inputModule.IsActionButtonDown() && IsInRepairStationRange() && _damageableObject.DamageValue > 0)
         {
+            _repairShop.StartRepairSound();
             _repairStationParticleSystem.SetActive(true);
             var value = _repairSpeed * Time.deltaTime;
             _damageableObject.Repair(value);
         }
         else
         {
+            _repairShop.StopRepairSound();
             _repairStationParticleSystem.SetActive(false);
             _damageableObject.RestartRepairs();
             _audioSource.Stop();

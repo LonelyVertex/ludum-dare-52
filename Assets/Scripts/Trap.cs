@@ -6,6 +6,7 @@ public abstract class Trap : MonoBehaviour
 
     public void TriggerTrap(DamageableObject damageableObject)
     {
+        damageableObject.PlayBombSound();
         damageableObject.Damage(gameObject.transform, damage);
         OnAfterTrapTrigger();
     }

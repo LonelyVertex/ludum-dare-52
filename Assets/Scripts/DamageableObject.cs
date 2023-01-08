@@ -12,6 +12,7 @@ public class DamageableObject : MonoBehaviour
     public Action<int> OnDamaged;
     public float _hitBumpStr;
     public Rigidbody _rigidbody;
+    public AudioSource _audioSource;
     
     public int DamageValue => _startHitPoints - _hitpoints;
 
@@ -58,6 +59,11 @@ public class DamageableObject : MonoBehaviour
         OnDamaged?.Invoke(_hitpoints);
     }
 
+    public void PlayBombSound()
+    {
+        _audioSource.Play();
+    }
+    
     public void Repair(float value)
     {
         _partialHitpoints += value;
