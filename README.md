@@ -1,3 +1,5 @@
+## The Wheat Is Yellower
+
 ## About our game jam
 
 Experience the thrill of collaborative game development with a unique project challenge! Inspired by the [Blackthornprod](https://twitter.com/Blackthornprod) where multiple people work on the same project without any extra information, we decided to try it ourselves. Five of us took turns working on the game for 5 hours each, with a strict time limit of 25 hours. The first person was given a theme and started with an empty project. The rest of us followed suit, adding our ideas and innovations to the game. Despite the time constraint, we had a blast working on this project. We hope you enjoy the final result of our fun and challenging exercise!
