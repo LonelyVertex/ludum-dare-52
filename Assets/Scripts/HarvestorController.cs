@@ -119,16 +119,15 @@ public class HarvestorController : MonoBehaviour
 
     private void HandleUnload()
     {
-        if (_inputModule.IsActionButtonDown())
+        if (_inputModule.IsActionButtonDown() && IsInSiloRange() && _currentlyStoredHarvestValue > 0)
         {
             var value = Mathf.Min(_currentlyStoredHarvestValue, Mathf.CeilToInt(_siloUnloadSpeed * Time.deltaTime));
             AddHarvest(-value);
             unloadToSilo?.Invoke(value);
+
             SpawnUnloadingGrain();
-            if (!_audioSource.isPlaying)
-            {
-                _audioSource.Play();
-            }
+            
+            if (!_audioSource.isPlaying) _audioSource.Play();
         }
         else
         {
@@ -150,7 +149,6 @@ public class HarvestorController : MonoBehaviour
             _repairShop.StopRepairSound();
             _repairStationParticleSystem.SetActive(false);
             _damageableObject.RestartRepairs();
-            _audioSource.Stop();
         }
     }
 
